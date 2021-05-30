@@ -16,7 +16,7 @@ app.post('/', (req, res)=>{
   var email = req.body.email;
   var amount = req.body.amount;
 
-//validating user to check if the amount is less or equal to 1
+//validating user to check if the amount is less or equal to 1 then test the if statement with postman
   if(amount <= 1){
     return_info = {};
     return_info.error = true;
