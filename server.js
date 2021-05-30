@@ -16,7 +16,7 @@ app.post('/', (req, res)=>{
   var email = req.body.email;
   var amount = req.body.amount;
 
-  //test if the post request will work
+  //using postman to test if the post request will work
   res.send({"amount": amount, "email": email});
 });
 
