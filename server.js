@@ -16,7 +16,15 @@ app.post('/', (req, res)=>{
   var email = req.body.email;
   var amount = req.body.amount;
 
-  //using postman to test if the post request will work
+//validating user to check if the amount is less or equal to 1
+  if(amount <= 1){
+    return_info = {};
+    return_info.error = true;
+    return_info.message = "The amount should be greater than 1";
+    return res.send(return_info);
+  }
+
+//using postman to test if the post request will work
   res.send({"amount": amount, "email": email});
 });
 
