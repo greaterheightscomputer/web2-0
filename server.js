@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const {save_user_information, get_total_amount } = require('./models/server_db');
+const path = require('path');
+const publicPath = path.join(__dirname, './public');
+
 // app.get('/', (req, res)=>{
 //   res.send('Hello Web 2.0');
 // })
@@ -12,7 +15,7 @@ const {save_user_information, get_total_amount } = require('./models/server_db')
 
 //its inform the post request api or other api that we are passing data value either from postman or any other medium
 app.use(bodyParser.json());
-
+app.use(express.static(publicPath));
 //inserting data to db
 // app.post('/', (req, res)=>{
 //   var email = req.body.email;
