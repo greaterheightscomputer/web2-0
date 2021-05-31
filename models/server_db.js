@@ -7,6 +7,15 @@ save_user_information = (data)=> new Promise((resolve, reject)=>{
     }
     resolve('Successful');
   });
-})
+});
 
-module.exports = { save_user_information }; //export save_user_information to use in server.js file
+get_total_amount = (data)=> new Promise((resolve, reject)=>{
+  db.query('select sum(amount) as total_amount from lottery_information', null, function(err, results, fields){
+    if(err){
+      reject('Could not get total amount');
+    }
+    resolve(results);
+  });
+});
+
+module.exports = { save_user_information, get_total_amount }; //export save_user_information to use in server.js file

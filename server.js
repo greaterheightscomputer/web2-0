@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const {save_user_information} = require('./modules/server_db');
+const {save_user_information, get_total_amount } = require('./models/server_db');
 // app.get('/', (req, res)=>{
 //   res.send('Hello Web 2.0');
 // })
@@ -13,6 +13,7 @@ const {save_user_information} = require('./modules/server_db');
 //its inform the post request api or other api that we are passing data value either from postman or any other medium
 app.use(bodyParser.json());
 
+//inserting data to db
 // app.post('/', (req, res)=>{
 //   var email = req.body.email;
 //   var amount = req.body.amount;
@@ -47,6 +48,12 @@ var result = await save_user_information({"amount":amount, "email":email});
 res.send(result);
 });
 
+//fetching data from db
+app.get('/get_total_amount', async(req, res)=>{
+  var result = await get_total_amount();
+  console.log(result);
+  res.send(result);
+});
 
 app.listen(3000, ()=>{
   console.log('server is running on port 3000');
