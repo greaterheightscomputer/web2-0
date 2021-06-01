@@ -7,6 +7,14 @@ class App extends React.Component{
       email: '',
     };
   }
+
+  async componentDidMount(){
+    const result = await axios.get('/get_total_amount');
+    // console.log(result);
+    // console.log(result.data[0].total_amount);
+    this.setState({total_amount:result.data[0].total_amount});
+  }
+
   onSubmit = async(event)=>{
     event.preventDefault();
     // alert(this.state.amount)
@@ -15,7 +23,7 @@ class App extends React.Component{
       amount: this.state.amount,
       email: this.state.email
     })
-    console.log(response);
+    // console.log(response);
   }
   render(){
     return(
