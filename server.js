@@ -35,7 +35,7 @@ app.use(express.static(publicPath));
 // });
 
 //async post request function
-app.post('/', async (req, res)=>{
+app.post('/post_info', async (req, res)=>{
   var email = req.body.email;
   var amount = req.body.amount;
 
