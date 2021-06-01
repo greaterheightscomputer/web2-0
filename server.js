@@ -16,6 +16,7 @@ const publicPath = path.join(__dirname, './public');
 //its inform the post request api or other api that we are passing data value either from postman or any other medium
 app.use(bodyParser.json());
 app.use(express.static(publicPath));
+
 //inserting data to db
 // app.post('/', (req, res)=>{
 //   var email = req.body.email;
