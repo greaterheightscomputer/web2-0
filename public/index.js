@@ -23,7 +23,8 @@ class App extends React.Component{
       amount: this.state.amount,
       email: this.state.email
     });
-    this.setState({amount: 0, email: ''}) //set input fields to default value back
+    window.location.href = response.data; //the code is use to catch return res.send(payment.links[i].href); inside server.js file
+    // this.setState({amount: 0, email: ''}) //set input fields to default value back
     // console.log(response);
   }
   render(){
