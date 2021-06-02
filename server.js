@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const {save_user_information, get_total_amount } = require('./models/server_db');
 const path = require('path');
 const publicPath = path.join(__dirname, './public');
+const paypal = require('paypal-rest-sdk');
 
 // app.get('/', (req, res)=>{
 //   res.send('Hello Web 2.0');
@@ -34,6 +35,13 @@ app.use(express.static(publicPath));
 //   res.send({"amount": amount, "email": email});
 // });
 
+//paypal configuration
+paypal.configure({
+  'mode': 'sandbox', //sandbox or live
+  'client_id': 'AUattrzRvD_rSeNbhYGbVcMtAGQV1UtHABKI_5yrI1io3BHOxwtj60usgfeUhsH08psy2XZ07_7uXO0-',
+  'client_secret': 'EMk-Br_Irk6Af26OZV8xpFDq82kbweO-l8VA0aLGnVNgNJBxpCigt4ApODIo2XIbfPvXqVtWakrp6GMR'
+});
+
 //async post request function
 app.post('/post_info', async (req, res)=>{
   var email = req.body.email;
@@ -55,7 +63,7 @@ res.send(result);
 //fetching data from db
 app.get('/get_total_amount', async(req, res)=>{
   var result = await get_total_amount();
-  console.log(result);
+  // console.log(result);
   res.send(result);
 });
 

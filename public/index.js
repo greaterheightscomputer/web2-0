@@ -3,7 +3,7 @@ class App extends React.Component{
     super(props);
     this.state = {
       total_amount: 1000,
-      amount: 100,
+      amount: 0,
       email: '',
     };
   }
@@ -22,7 +22,8 @@ class App extends React.Component{
     const response = await axios.post('/post_info', {
       amount: this.state.amount,
       email: this.state.email
-    })
+    });
+    this.setState({amount: 0, email: ''}) //set input fields to default value back
     // console.log(response);
   }
   render(){
