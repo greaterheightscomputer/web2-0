@@ -55,7 +55,8 @@ app.post('/post_info', async (req, res)=>{
   }
 
 //insert into db
-var result = await save_user_information({"amount":amount, "email":email});
+var fee_amount = amount * 0.9 //deduct paypal fee from the total amount
+var result = await save_user_information({"amount":fee_amount, "email":email});
 // res.send({"amount": amount, "email": email});
 
 var create_payment_json = {
@@ -88,7 +89,6 @@ var create_payment_json = {
     }]
 };
 
-
 paypal.payment.create(create_payment_json, function (error, payment) {
     if (error) {
         throw error;
@@ -96,15 +96,42 @@ paypal.payment.create(create_payment_json, function (error, payment) {
         console.log("Create Payment Response");
         console.log(payment);
 
-        //write a code that will read the content of payment array and redirect the users to paypal website
+        //write a code that will read the content of payment object and redirect the users to paypal website
         for(var i=0; i < payment.links.length; i++){
           if(payment.links[i].rel == 'approval_url'){
+            console.log(payment.links[i].href);
             return res.send(payment.links[i].href);
           }
         }
     }
 });
 // res.send(result);
+});
+
+//get request function '/success' url argument must be the samething with create_payment_json object with "redirect_urls" property which value is "return_url": "http://localhost:3000/success",
+app.get('/success', (req, res)=>{
+  const payerId = req.query.PayerID; //get the value of req.query.PayerID from the url
+  const paymentId = req.query.paymentId; //get the value of  req.query.paymentId from the url
+  var execute_payment_json = {
+    "payer_id": payerId,
+    "transactions": [{
+      "amount":{
+        "currency": "USD",
+        "total": 100
+      }
+    }]
+  };
+
+  //paypal predefined method
+  paypal.payment.execute(paymentId, execute_payment_json, function(err, payment){
+    if(err){
+      console.log(error.response);
+      throw error;
+    }else{
+      console.log(payment);
+    }
+  });
+  res.redirect('http://localhost:3000'); //redirect user back to localhost
 });
 
 //fetching data from db
