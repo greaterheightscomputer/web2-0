@@ -5,6 +5,7 @@ const {save_user_information, get_total_amount } = require('./models/server_db')
 const path = require('path');
 const publicPath = path.join(__dirname, './public');
 const paypal = require('paypal-rest-sdk');
+const session = require('express-session');
 
 // app.get('/', (req, res)=>{
 //   res.send('Hello Web 2.0');
@@ -13,6 +14,9 @@ const paypal = require('paypal-rest-sdk');
 // app.listen(3000, ()=>{
 //   console.log('server is running on port 3000');
 // })
+
+//configure session
+app.use(session({secret: 'my web app', cookie: {maxAge: 60000}}));
 
 //its inform the post request api or other api that we are passing data value either from postman or any other medium
 app.use(bodyParser.json());
@@ -55,9 +59,10 @@ app.post('/post_info', async (req, res)=>{
   }
 
 //insert into db
-var fee_amount = amount * 0.9 //deduct paypal fee from the total amount
+var fee_amount = amount * 0.968; //deduct paypal fee from the total amount
 var result = await save_user_information({"amount":fee_amount, "email":email});
 // res.send({"amount": amount, "email": email});
+req.session.paypal_amount = amount; //store on session
 
 var create_payment_json = {
     "intent": "sale",
@@ -82,13 +87,14 @@ var create_payment_json = {
             "currency": "USD",
             "total": amount
         },
-        'payee':{ //add this property its manager infor
+        'payee':{ //add this property so that the manager will receive payment once a Participant pay
           'email': 'managerlottery@gmail.com'
         },
         "description": "Lottery Purchase."
     }]
 };
 
+//redirect user to paypal from view
 paypal.payment.create(create_payment_json, function (error, payment) {
     if (error) {
         throw error;
@@ -108,6 +114,7 @@ paypal.payment.create(create_payment_json, function (error, payment) {
 // res.send(result);
 });
 
+//user actual make payment to manager account
 //get request function '/success' url argument must be the samething with create_payment_json object with "redirect_urls" property which value is "return_url": "http://localhost:3000/success",
 app.get('/success', (req, res)=>{
   const payerId = req.query.PayerID; //get the value of req.query.PayerID from the url
@@ -117,12 +124,13 @@ app.get('/success', (req, res)=>{
     "transactions": [{
       "amount":{
         "currency": "USD",
-        "total": 100
+        // "total": 100
+        "total": req.session.paypal_amount
       }
     }]
   };
 
-  //paypal predefined method
+  //paypal predefined method to execute payment from the Participant to manager account
   paypal.payment.execute(paymentId, execute_payment_json, function(err, payment){
     if(err){
       console.log(error.response);
