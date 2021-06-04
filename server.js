@@ -15,7 +15,7 @@ const session = require('express-session');
 //   console.log('server is running on port 3000');
 // })
 
-//configure session
+//configure session for use
 app.use(session({secret: 'my web app', cookie: {maxAge: 60000}}));
 
 //its inform the post request api or other api that we are passing data value either from postman or any other medium
@@ -116,7 +116,7 @@ paypal.payment.create(create_payment_json, function (error, payment) {
 
 //user actual make payment to manager account
 //get request function '/success' url argument must be the samething with create_payment_json object with "redirect_urls" property which value is "return_url": "http://localhost:3000/success",
-app.get('/success', (req, res)=>{
+app.get('/success', async(req, res)=>{
   const payerId = req.query.PayerID; //get the value of req.query.PayerID from the url
   const paymentId = req.query.paymentId; //get the value of  req.query.paymentId from the url
   var execute_payment_json = {
@@ -138,6 +138,12 @@ app.get('/success', (req, res)=>{
       console.log(payment);
     }
   });
+
+  //delete all mysql users
+  if(req.session.winner_picked){
+      var deleted = await delete_users();
+  }
+  req.session.winner_picked = false;
   res.redirect('http://localhost:3000'); //redirect user back to localhost
 });
 
@@ -174,10 +180,11 @@ list_of_participants.forEach(function(element){
 // console.log(email_array);
 
 //add javaScript random method to pick a winner
-var winner = email_array[Math.floor(Math.random() * email_array.length)];
- console.log(winner);
+var winner_email = email_array[Math.floor(Math.random() * email_array.length)];
+ // console.log(winner_email);
+ req.session.winner_picked = true;
 
-return true; //becos we don't this rest of codes to fire
+// return true; //becos we don't this rest of codes to fire
 
 //Create Paypal payment
 var create_payment_json = {
