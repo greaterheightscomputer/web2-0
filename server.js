@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const {save_user_information, get_total_amount } = require('./models/server_db');
+const {save_user_information, get_total_amount, get_list_of_participants } = require('./models/server_db');
 const path = require('path');
 const publicPath = path.join(__dirname, './public');
 const paypal = require('paypal-rest-sdk');
@@ -160,6 +160,25 @@ app.get('/pick_winner', async(req, res)=>{
 //1. We need to write a query to get a list of all the Participants
 //2. we need to pick a winner
 
+//get list of participants from db
+var list_of_participants = await get_list_of_participants();
+// console.log(list_of_participants);
+var email_array = []; //push all the participants emails onto email_array
+
+//convert data from json format to javaScript array of object then access individual object inside the array of object
+list_of_participants = JSON.parse(JSON.stringify(list_of_participants));
+list_of_participants.forEach(function(element){
+  // console.log(element);
+  email_array.push(element.email);
+});
+// console.log(email_array);
+
+//add javaScript random method to pick a winner
+var winner = email_array[Math.floor(Math.random() * email_array.length)];
+ console.log(winner);
+
+return true; //becos we don't this rest of codes to fire
+
 //Create Paypal payment
 var create_payment_json = {
     "intent": "sale",
@@ -184,7 +203,7 @@ var create_payment_json = {
             "currency": "USD",
             "total": req.session.paypal_amount
         },
-        'payee':{ //add this property so that the manager will receive payment once a Participant pay
+        'payee':{ //add the information of the winner
           'email': winner_email
         },
         "description": "Paying the winner of the lottery application"
