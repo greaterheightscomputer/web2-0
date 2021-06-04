@@ -59,7 +59,8 @@ app.post('/post_info', async (req, res)=>{
   }
 
 //insert into db
-var fee_amount = amount * 0.968; //deduct paypal fee from the total amount
+var serviceCharge = amount * (0.029 + 0.30); //deduct paypal service charge from the total amount
+var fee_amount = amount - serviceCharge;
 var result = await save_user_information({"amount":fee_amount, "email":email});
 // res.send({"amount": amount, "email": email});
 req.session.paypal_amount = amount; //store on session
@@ -95,9 +96,9 @@ var create_payment_json = {
 };
 
 //redirect user to paypal from view
-paypal.payment.create(create_payment_json, function (error, payment) {
-    if (error) {
-        throw error;
+paypal.payment.create(create_payment_json, function (err, payment) {
+    if (err) {
+        throw err;
     } else {
         console.log("Create Payment Response");
         console.log(payment);
@@ -130,10 +131,10 @@ app.get('/success', async(req, res)=>{
   };
 
   //paypal predefined method to execute payment from the Participant to manager account
-  paypal.payment.execute(paymentId, execute_payment_json, function(err, payment){
-    if(err){
-      console.log(err.response);
-      throw err;
+  paypal.payment.execute(paymentId, execute_payment_json, function(error, payment){
+    if(error){
+      console.log(error.response);
+      throw error;
     }else{
       console.log(payment);
     }
@@ -210,11 +211,11 @@ var create_payment_json = {
             "currency": "USD",
             "total": req.session.paypal_amount
         },
-        'payee':{ //add the information of the winner
+        'payee':{ //payment always goes to the payee and here the payee is the winner
           'email': winner_email
         },
         "description": "Paying the winner of the lottery application"
-    }]
+    }]  
 };
 
 paypal.payment.create(create_payment_json, function (error, payment) {
@@ -224,16 +225,14 @@ paypal.payment.create(create_payment_json, function (error, payment) {
         console.log("Create Payment Response");
         console.log(payment);
 
-        //write a code that will read the content of payment object and redirect the users to paypal website
         for(var i=0; i < payment.links.length; i++){
           if(payment.links[i].rel == 'approval_url'){
             console.log(payment.links[i].href);
-            return res.send(payment.links[i].href);
+            return res.redirect(payment.links[i].href);
           }
         }
     }
 });
-
 });
 
 app.listen(3000, ()=>{

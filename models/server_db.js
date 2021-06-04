@@ -36,4 +36,4 @@ delete_users = (data)=> new Promise((resolve, reject)=>{
   })
 });
 
-module.exports = { save_user_information, get_total_amount, get_list_of_participants }; //export save_user_information to use in server.js file
+module.exports = { save_user_information, get_total_amount, get_list_of_participants, delete_users }; //export save_user_information to use in server.js file
