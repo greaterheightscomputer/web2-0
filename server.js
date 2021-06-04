@@ -189,7 +189,7 @@ var winner_email = email_array[Math.floor(Math.random() * email_array.length)];
 
 //Create Paypal payment
 var create_payment_json = {
-    "intent": "sale",
+    "intent": "sale", 
     "payer": {
         "payment_method": "paypal"
     },
@@ -215,7 +215,7 @@ var create_payment_json = {
           'email': winner_email
         },
         "description": "Paying the winner of the lottery application"
-    }]  
+    }]
 };
 
 paypal.payment.create(create_payment_json, function (error, payment) {
